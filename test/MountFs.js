@@ -29,6 +29,34 @@ describe('MountFs', function () {
             expect(mountedFs.readFileSync, 'was not called');
         });
 
+        describe('#readdir()', function () {
+            it.skip('should include a fakeFs entry in the results for the test directory', function (done) {
+                mountFs.readdir(__dirname, passError(done, function (names) {
+                    expect(names, 'to contain', 'fakeFs');
+                }));
+            });
+        });
+
+        describe('#readdirSync()', function () {
+            it.skip('should include a fakeFs entry in the results for the test directory', function () {
+                expect(mountFs.readdirSync(__dirname), 'to contain', 'fakeFs');
+            });
+        });
+
+        describe('#stat()', function () {
+            it.skip('should report the fakeFs entry as a directory', function (done) {
+                mountFs.stat(Path.resolve(__dirname, 'fakeFs'), passError(done, function (stats) {
+                    expect(stats.isDirectory(), 'to equal', true);
+                }));
+            });
+        });
+
+        describe('#statSync()', function () {
+            it.skip('should report the fakeFs entry as a directory', function (done) {
+                expect(mountFs.statSync(Path.resolve(__dirname, 'fakeFs')), 'to equal', true);
+            });
+        });
+
         describe('with a stat and statSync that throw OUTSIDETREE errors', function () {
             beforeEach(function () {
                 mountedFs.stat = sinon.spy(function (path, cb) {
