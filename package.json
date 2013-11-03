@@ -1,0 +1,33 @@
+{
+  "name": "mountfs",
+  "version": "0.1.0",
+  "description": "fs-compatible module with the ability to mount other fs-compatible modules at specific locations",
+  "main": "lib/MountFs.js",
+  "devDependencies": {
+    "mocha": "=1.13.0",
+    "sinon": "=1.7.3",
+    "unexpected": "=1.0.0",
+    "unexpected-sinon": "=0.1.0"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/papandreou/node-mountfs.git"
+  },
+  "keywords": [
+    "fs",
+    "git"
+  ],
+  "author": "Andreas Lind Petersen <andreas@one.com>",
+  "license": "BSD",
+  "dependencies": {
+    "async": "=0.2.9",
+    "passerror": "0.0.2",
+    "underscore": "=1.5.2"
+  }
+}
