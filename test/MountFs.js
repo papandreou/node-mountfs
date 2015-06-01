@@ -18,6 +18,11 @@ describe('MountFs', function () {
             mountFs.mount(Path.resolve(__dirname, 'fakeFs'), mountedFs);
         });
 
+        it('should be possible to read a file outside a mounted fs', function () {
+            var content = mountFs.readFileSync(Path.resolve(__dirname, '..', 'package.json'));
+            expect(content, 'to match', /^{/);
+        });
+
         it('should proxy to mountedFs.readFileSync and strip away .../fakeFs from the path', function () {
             mountFs.readFileSync(Path.resolve(__dirname, 'fakeFs', 'quux'));
             expect(mountedFs.readFileSync, 'was called once');
