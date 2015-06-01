@@ -4,10 +4,10 @@
   "description": "fs-compatible module with the ability to mount other fs-compatible modules at specific locations",
   "main": "lib/MountFs.js",
   "devDependencies": {
-    "mocha": "=1.13.0",
-    "sinon": "=1.7.3",
-    "unexpected": "=1.0.0",
-    "unexpected-sinon": "=0.1.0"
+    "mocha": "2.2.5",
+    "sinon": "1.14.1",
+    "unexpected": "7.5.1",
+    "unexpected-sinon": "6.1.2"
   },
   "directories": {
     "test": "test"

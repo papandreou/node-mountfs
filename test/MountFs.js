@@ -1,5 +1,7 @@
-var expect = require('unexpected-sinon'),
-    Path = require('path'),
+var expect = require('unexpected')
+    .clone()
+    .installPlugin(require('unexpected-sinon'));
+var Path = require('path'),
     passError = require('passerror'),
     sinon = require('sinon'),
     MountFs = require('../lib/MountFs');
@@ -19,7 +21,7 @@ describe('MountFs', function () {
         });
 
         it('should be possible to read a file outside a mounted fs', function () {
-            var content = mountFs.readFileSync(Path.resolve(__dirname, '..', 'package.json'));
+            var content = mountFs.readFileSync(Path.resolve(__dirname, '..', 'package.json'), 'utf-8');
             expect(content, 'to match', /^{/);
         });
 
