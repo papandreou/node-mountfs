@@ -6,8 +6,8 @@
   "devDependencies": {
     "mocha": "2.2.5",
     "sinon": "1.14.1",
-    "unexpected": "7.5.1",
-    "unexpected-sinon": "6.1.2"
+    "unexpected": "10.4.0",
+    "unexpected-sinon": "9.0.4"
   },
   "directories": {
     "test": "test"
