@@ -2,6 +2,7 @@ var expect = require('unexpected')
     .clone()
     .installPlugin(require('unexpected-sinon'));
 var Path = require('path'),
+    fs = require('fs'),
     passError = require('passerror'),
     sinon = require('sinon'),
     MountFs = require('../lib/MountFs');
@@ -92,6 +93,79 @@ describe('MountFs', function () {
             it('should stat MountFs.js when invoking statSync on a file inside the directory where the fakeFs is mounted', function () {
                 expect(mountFs.statSync(Path.resolve(__dirname, 'fakeFs', 'baz')).isFile(), 'to equal', true);
             });
+        });
+    });
+    describe('with a strict fake fs implementation mounted at <testDir>/fakeFs', function () {
+        var fs = require('fs');
+        before(function () {
+            MountFs.patchInPlace();
+
+            var mountedFs = {
+                readFileSync: sinon.spy(function (path) {
+                    switch (path) {
+                        case '/foo.txt':
+                            return 'foofoofoo';
+                        case '/foo/bar/baz.txt':
+                            return 'foobarbaz';
+                        default:
+                            throw new Error("Error: ENOENT, no such file or directory '" + path + "'");
+                    }
+                    console.log('readFileSync', path);
+                    return "foobar";
+                })
+            };
+
+            fs.mount(Path.resolve(__dirname, 'fakeFs'), mountedFs);
+        });
+        after(function () {
+            fs.unmount(Path.resolve(__dirname, 'fakeFs'));
+            fs.unpatch();
+        });
+
+        it('should be able to read a file from the root of the mounted fs', function () {
+            var file = Path.resolve(__dirname, 'fakeFs', 'foo.txt');
+            return expect(fs.readFileSync(file), 'to equal', 'foofoofoo');
+        });
+
+        it('should be able to read a file from the mounted fs', function () {
+            var file = Path.resolve(__dirname, 'fakeFs', 'foo/bar/baz.txt');
+            return expect(fs.readFileSync(file), 'to equal', 'foobarbaz');
+        });
+    });
+    describe('with a strict fake fs implementation mounted at /', function () {
+        before(function () {
+            MountFs.patchInPlace();
+
+            var mountedFs = {
+                readFileSync: sinon.spy(function (path) {
+                    switch (path) {
+                        case '/foo.txt':
+                            return 'foofoofoo';
+                        case '/foo/bar/baz.txt':
+                            return 'foobarbaz';
+                        default:
+                            throw new Error("Error: ENOENT, no such file or directory '" + path + "'");
+                    }
+                    console.log('readFileSync', path);
+                    return "foobar";
+                })
+            };
+
+            fs.mount('/', mountedFs);
+        });
+        after(function () {
+            fs.unmount('/');
+            fs.unpatch();
+        });
+
+        it('should be able to read a file from the root of the mounted fs', function () {
+            var file = '/foo.txt';
+            return expect(fs.readFileSync(file), 'to equal', 'foofoofoo');
+        });
+
+        it('should be able to read a file from the mounted fs', function () {
+            var file = '/foo/bar/baz.txt';
+            return expect(fs.readFileSync(file), 'to equal', 'foobarbaz');
         });
     });
 });
