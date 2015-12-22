@@ -38,16 +38,18 @@ describe('MountFs', function () {
         });
 
         describe('#readdir()', function () {
-            it.skip('should include a fakeFs entry in the results for the test directory', function (done) {
+            it('should include a fakeFs entry in the results for the test directory', function (done) {
                 mountFs.readdir(__dirname, passError(done, function (names) {
                     expect(names, 'to contain', 'fakeFs');
+                    done();
                 }));
             });
         });
 
         describe('#readdirSync()', function () {
-            it.skip('should include a fakeFs entry in the results for the test directory', function () {
+            it('should include a fakeFs entry in the results for the test directory', function (done) {
                 expect(mountFs.readdirSync(__dirname), 'to contain', 'fakeFs');
+                done();
             });
         });
 
@@ -166,6 +168,60 @@ describe('MountFs', function () {
         it('should be able to read a file from the mounted fs', function () {
             var file = '/foo/bar/baz.txt';
             return expect(fs.readFileSync(file), 'to equal', 'foobarbaz');
+        });
+    });
+
+    describe('with a fake fs implementation mounted at <testDir>/foo/fakeFs', function () {
+        var mountedFs,
+            mountFs;
+        beforeEach(function () {
+            mountedFs = {
+                readFileSync: sinon.spy(function () {
+                    return "foobar";
+                })
+            };
+            mountFs = new MountFs();
+            mountFs.mount(Path.resolve(__dirname, 'foo', 'fakeFs'), mountedFs);
+        });
+
+        describe('#readdir()', function () {
+            it('should list "foo" in <testDir>', function (done) {
+                mountFs.readdir(__dirname, passError(done, function (names) {
+                    expect(names, 'to contain', 'foo');
+                    done();
+                }));
+            });
+
+            it('should list "fakeFs" in <testDir>/foo', function (done) {
+                mountFs.readdir(Path.resolve(__dirname, 'foo'), passError(done, function (names) {
+                    expect(names, 'to contain', 'fakeFs');
+                    done();
+                }));
+            });
+        });
+
+        describe('#readdirSync()', function () {
+            it('should list "foo" in <testDir>', function () {
+                expect(mountFs.readdirSync(__dirname), 'to contain', 'foo');
+            });
+
+            it('should list "fakeFs" in <testDir>/foo', function () {
+                expect(mountFs.readdirSync(Path.resolve(__dirname, 'foo')), 'to contain', 'fakeFs');
+            });
+        });
+
+        describe('#stat()', function () {
+            it.skip('should report <testDir>/foo as a directory', function (done) {
+                mountFs.stat(Path.resolve(__dirname, 'foo'), passError(done, function (stats) {
+                    expect(stats.isDirectory(), 'to equal', true);
+                }));
+            });
+        });
+
+        describe('#statSync()', function () {
+            it.skip('should report <testDir>/foo as a directory', function (done) {
+                expect(mountFs.statSync(Path.resolve(__dirname, 'foo')), 'to equal', true);
+            });
         });
     });
 });
