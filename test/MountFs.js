@@ -21,24 +21,6 @@ describe('MountFs', function () {
             mountFs.mount(Path.resolve(__dirname, 'fakeFs'), mountedFs);
         });
 
-        it('refuses to fs.link out of the mounted fs', function () {
-            expect(function () {
-                expect(mountFs.link(__filename, Path.resolve(__dirname, 'fakeFs', 'theTestSuite.js')));
-            }, 'to throw', 'mountFs: Cannot fs.link between mounted file systems');
-        });
-
-        it('refuses to fs.link into the mounted fs', function () {
-            expect(function () {
-                expect(mountFs.link(Path.resolve(__dirname, '..', 'LICENSE'), Path.resolve(__dirname, 'fakeFs', 'theLicense')));
-            }, 'to throw', 'mountFs: Cannot fs.link between mounted file systems');
-        });
-
-        it('allows linking within the mounted fs', function () {
-            mountedFs.linkSync = sinon.spy().named('linkSync');
-            mountFs.linkSync(Path.resolve(__dirname, 'fakeFs', 'source.txt'), Path.resolve(__dirname, 'fakeFs', 'target.txt'));
-            expect(mountedFs.linkSync, 'was called with', '/source.txt', '/target.txt');
-        });
-
         it('should be possible to read a file outside a mounted fs', function () {
             var content = mountFs.readFileSync(Path.resolve(__dirname, '..', 'package.json'), 'utf-8');
             expect(content, 'to match', /^{/);
@@ -112,6 +94,46 @@ describe('MountFs', function () {
 
             it('should stat MountFs.js when invoking statSync on a file inside the directory where the fakeFs is mounted', function () {
                 expect(mountFs.statSync(Path.resolve(__dirname, 'fakeFs', 'baz')).isFile(), 'to equal', true);
+            });
+        });
+
+        describe('#link', function () {
+            it('refuses to fs.link out of the mounted fs', function () {
+                expect(function () {
+                    expect(mountFs.link(__filename, Path.resolve(__dirname, 'fakeFs', 'theTestSuite.js')));
+                }, 'to throw', 'mountFs: Cannot fs.link between mounted file systems');
+            });
+
+            it('refuses to fs.link into the mounted fs', function () {
+                expect(function () {
+                    expect(mountFs.link(Path.resolve(__dirname, '..', 'LICENSE'), Path.resolve(__dirname, 'fakeFs', 'theLicense')));
+                }, 'to throw', 'mountFs: Cannot fs.link between mounted file systems');
+            });
+
+            it('allows linking within the mounted fs', function () {
+                mountedFs.linkSync = sinon.spy().named('linkSync');
+                mountFs.linkSync(Path.resolve(__dirname, 'fakeFs', 'source.txt'), Path.resolve(__dirname, 'fakeFs', 'target.txt'));
+                expect(mountedFs.linkSync, 'was called with', '/source.txt', '/target.txt');
+            });
+        });
+
+        describe('#rename', function () {
+            it('refuses to fs.rename out of the mounted fs', function () {
+                expect(function () {
+                    expect(mountFs.rename(__filename, Path.resolve(__dirname, 'fakeFs', 'theTestSuite.js')));
+                }, 'to throw', 'mountFs: Cannot fs.rename between mounted file systems');
+            });
+
+            it('refuses to fs.rename into the mounted fs', function () {
+                expect(function () {
+                    expect(mountFs.rename(Path.resolve(__dirname, '..', 'LICENSE'), Path.resolve(__dirname, 'fakeFs', 'theLicense')));
+                }, 'to throw', 'mountFs: Cannot fs.rename between mounted file systems');
+            });
+
+            it('allows renameing within the mounted fs', function () {
+                mountedFs.renameSync = sinon.spy().named('renameSync');
+                mountFs.renameSync(Path.resolve(__dirname, 'fakeFs', 'source.txt'), Path.resolve(__dirname, 'fakeFs', 'target.txt'));
+                expect(mountedFs.renameSync, 'was called with', '/source.txt', '/target.txt');
             });
         });
     });
