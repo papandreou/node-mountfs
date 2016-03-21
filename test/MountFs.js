@@ -21,6 +21,24 @@ describe('MountFs', function () {
             mountFs.mount(Path.resolve(__dirname, 'fakeFs'), mountedFs);
         });
 
+        it('refuses to fs.link out of the mounted fs', function () {
+            expect(function () {
+                expect(mountFs.link(__filename, Path.resolve(__dirname, 'fakeFs', 'theTestSuite.js')));
+            }, 'to throw', 'mountFs: Cannot fs.link between mounted file systems');
+        });
+
+        it('refuses to fs.link into the mounted fs', function () {
+            expect(function () {
+                expect(mountFs.link(Path.resolve(__dirname, '..', 'LICENSE'), Path.resolve(__dirname, 'fakeFs', 'theLicense')));
+            }, 'to throw', 'mountFs: Cannot fs.link between mounted file systems');
+        });
+
+        it('allows linking within the mounted fs', function () {
+            mountedFs.linkSync = sinon.spy().named('linkSync');
+            mountFs.linkSync(Path.resolve(__dirname, 'fakeFs', 'source.txt'), Path.resolve(__dirname, 'fakeFs', 'target.txt'));
+            expect(mountedFs.linkSync, 'was called with', '/source.txt', '/target.txt');
+        });
+
         it('should be possible to read a file outside a mounted fs', function () {
             var content = mountFs.readFileSync(Path.resolve(__dirname, '..', 'package.json'), 'utf-8');
             expect(content, 'to match', /^{/);
