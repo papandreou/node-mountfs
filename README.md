@@ -22,5 +22,5 @@ fs.mount('/home/john/mountPath', fileSystemToBeMounted);
 
 fs.readFileSync('/home/john/mountPath/foobar.txt', 'utf-8');
 
-fs.umount('/home/john/mountPath');
+fs.unmount('/home/john/mountPath');
 ```
