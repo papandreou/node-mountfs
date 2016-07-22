@@ -152,7 +152,6 @@ describe('MountFs', function () {
                         default:
                             throw new Error("Error: ENOENT, no such file or directory '" + path + "'");
                     }
-                    console.log('readFileSync', path);
                     return "foobar";
                 })
             };
@@ -218,6 +217,11 @@ describe('MountFs', function () {
             mountedFs = {
                 readFileSync: sinon.spy(function () {
                     return "foobar";
+                }),
+                open: sinon.spy(function (path, cb) {
+                    setImmediate(function () {
+                        cb(null, 42);
+                    });
                 })
             };
             mountFs = new MountFs();
@@ -261,6 +265,67 @@ describe('MountFs', function () {
         describe('#statSync()', function () {
             it.skip('should report <testDir>/foo as a directory', function (done) {
                 expect(mountFs.statSync(Path.resolve(__dirname, 'foo')), 'to equal', true);
+            });
+        });
+    });
+
+    describe('with a fake fs implementation with support for open and close mounted at <testDir>/fakeFs', function () {
+        var mountedFs,
+            mountFs;
+        beforeEach(function () {
+            mountedFs = {
+                open: sinon.spy(function (path, mode, cb) {
+                    setImmediate(function () {
+                        cb(null, 42);
+                    });
+                }).named('open'),
+                close: sinon.spy(function (fd, cb) {
+                    setImmediate(cb);
+                }).named('close')
+            };
+            mountFs = new MountFs();
+            mountFs.mount(Path.resolve(__dirname, 'fakeFs'), mountedFs);
+        });
+
+        describe('#open()', function () {
+            it('should call the callback with a file descriptor number', function () {
+                return expect.promise(function (run) {
+                    mountFs.open(Path.resolve(__dirname, 'fakeFs', 'foo.txt'), 'r', run(function (err, fd) {
+                        expect(err, 'to be falsy');
+                        expect(fd, 'to equal', 42);
+                    }));
+                }).then(function () {
+                    return expect.promise(function (run) {
+                        mountFs.close(42, run());
+                    });
+                }).then(function () {
+                    expect(mountedFs.open, 'was called once');
+                    expect(mountedFs.close, 'was called once');
+                });
+            });
+        });
+    });
+
+    describe('with a fake fs implementation with support for openSync and closeSync mounted at <testDir>/fakeFs', function () {
+        var mountedFs,
+            mountFs;
+        beforeEach(function () {
+            mountedFs = {
+                openSync: sinon.stub().named('openSync').returns(42),
+                closeSync: sinon.stub().named('closeSync')
+            };
+            mountFs = new MountFs();
+            mountFs.mount(Path.resolve(__dirname, 'fakeFs'), mountedFs);
+        });
+
+        describe('#open()', function () {
+            it('should call the callback with a file descriptor number', function () {
+                expect(mountFs.openSync(Path.resolve(__dirname, 'fakeFs', 'foo.txt'), 'r'), 'to equal', 42);
+                mountFs.closeSync(42);
+                expect([mountedFs.openSync, mountedFs.closeSync], 'to have calls satisfying', function () {
+                    mountedFs.openSync('/foo.txt', 'r')
+                    mountedFs.closeSync(42);
+                });
             });
         });
     });
