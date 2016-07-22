@@ -5,9 +5,9 @@
   "main": "lib/MountFs.js",
   "devDependencies": {
     "mocha": "2.2.5",
-    "sinon": "1.14.1",
-    "unexpected": "10.4.0",
-    "unexpected-sinon": "9.0.4"
+    "sinon": "1.17.4",
+    "unexpected": "10.15.0",
+    "unexpected-sinon": "10.2.1"
   },
   "directories": {
     "test": "test"
