@@ -289,18 +289,22 @@ describe('MountFs', function () {
 
         describe('#open()', function () {
             it('should call the callback with a file descriptor number', function () {
+                var fd;
                 return expect.promise(function (run) {
-                    mountFs.open(Path.resolve(__dirname, 'fakeFs', 'foo.txt'), 'r', run(function (err, fd) {
+                    mountFs.open(Path.resolve(__dirname, 'fakeFs', 'foo.txt'), 'r', run(function (err, _fd) {
+                        fd = _fd;
                         expect(err, 'to be falsy');
-                        expect(fd, 'to equal', 42);
+                        expect(fd, 'to be greater than', 1000);
                     }));
                 }).then(function () {
                     return expect.promise(function (run) {
-                        mountFs.close(42, run());
+                        mountFs.close(fd, run());
                     });
                 }).then(function () {
-                    expect(mountedFs.open, 'was called once');
-                    expect(mountedFs.close, 'was called once');
+                    expect([mountedFs.open, mountedFs.close], 'to have calls satisfying', function () {
+                        mountedFs.open('/foo.txt', 'r', expect.it('to be a function'));
+                        mountedFs.close(42, expect.it('to be a function'));
+                    });
                 });
             });
         });
@@ -320,8 +324,9 @@ describe('MountFs', function () {
 
         describe('#open()', function () {
             it('should call the callback with a file descriptor number', function () {
-                expect(mountFs.openSync(Path.resolve(__dirname, 'fakeFs', 'foo.txt'), 'r'), 'to equal', 42);
-                mountFs.closeSync(42);
+                var fd = mountFs.openSync(Path.resolve(__dirname, 'fakeFs', 'foo.txt'), 'r');
+                expect(fd, 'to be greater than', 1000);
+                mountFs.closeSync(fd);
                 expect([mountedFs.openSync, mountedFs.closeSync], 'to have calls satisfying', function () {
                     mountedFs.openSync('/foo.txt', 'r')
                     mountedFs.closeSync(42);
