@@ -1,11 +1,11 @@
 var expect = require('unexpected')
     .clone()
     .installPlugin(require('unexpected-sinon'));
-var Path = require('path'),
-    fs = require('fs'),
-    passError = require('passerror'),
-    sinon = require('sinon'),
-    MountFs = require('../lib/MountFs');
+var pathModule = require('path');
+var fs = require('fs');
+var passError = require('passerror');
+var sinon = require('sinon');
+var MountFs = require('../lib/MountFs');
 
 describe('MountFs', function () {
     describe('with a fake fs implementation mounted at <testDir>/fakeFs', function () {
@@ -18,16 +18,16 @@ describe('MountFs', function () {
                 })
             };
             mountFs = new MountFs();
-            mountFs.mount(Path.resolve(__dirname, 'fakeFs'), mountedFs);
+            mountFs.mount(pathModule.resolve(__dirname, 'fakeFs'), mountedFs);
         });
 
         it('should be possible to read a file outside a mounted fs', function () {
-            var content = mountFs.readFileSync(Path.resolve(__dirname, '..', 'package.json'), 'utf-8');
+            var content = mountFs.readFileSync(pathModule.resolve(__dirname, '..', 'package.json'), 'utf-8');
             expect(content, 'to match', /^{/);
         });
 
         it('should proxy to mountedFs.readFileSync and strip away .../fakeFs from the path', function () {
-            mountFs.readFileSync(Path.resolve(__dirname, 'fakeFs', 'quux'));
+            mountFs.readFileSync(pathModule.resolve(__dirname, 'fakeFs', 'quux'));
             expect(mountedFs.readFileSync, 'was called once');
             expect(mountedFs.readFileSync, 'was called with', '/quux');
         });
@@ -55,7 +55,7 @@ describe('MountFs', function () {
 
         describe('#stat()', function () {
             it.skip('should report the fakeFs entry as a directory', function (done) {
-                mountFs.stat(Path.resolve(__dirname, 'fakeFs'), passError(done, function (stats) {
+                mountFs.stat(pathModule.resolve(__dirname, 'fakeFs'), passError(done, function (stats) {
                     expect(stats.isDirectory(), 'to equal', true);
                 }));
             });
@@ -63,7 +63,7 @@ describe('MountFs', function () {
 
         describe('#statSync()', function () {
             it.skip('should report the fakeFs entry as a directory', function (done) {
-                expect(mountFs.statSync(Path.resolve(__dirname, 'fakeFs')), 'to equal', true);
+                expect(mountFs.statSync(pathModule.resolve(__dirname, 'fakeFs')), 'to equal', true);
             });
         });
 
@@ -86,33 +86,33 @@ describe('MountFs', function () {
             });
 
             it('should stat MountFs.js when invoking stat on a file inside the directory where the fakeFs is mounted', function (done) {
-                mountFs.stat(Path.resolve(__dirname, 'fakeFs', 'baz'), passError(done, function (stats) {
+                mountFs.stat(pathModule.resolve(__dirname, 'fakeFs', 'baz'), passError(done, function (stats) {
                     expect(stats.isFile(), 'to equal', true);
                     done();
                 }));
             });
 
             it('should stat MountFs.js when invoking statSync on a file inside the directory where the fakeFs is mounted', function () {
-                expect(mountFs.statSync(Path.resolve(__dirname, 'fakeFs', 'baz')).isFile(), 'to equal', true);
+                expect(mountFs.statSync(pathModule.resolve(__dirname, 'fakeFs', 'baz')).isFile(), 'to equal', true);
             });
         });
 
         describe('#link', function () {
             it('refuses to fs.link out of the mounted fs', function () {
                 expect(function () {
-                    expect(mountFs.link(__filename, Path.resolve(__dirname, 'fakeFs', 'theTestSuite.js')));
+                    expect(mountFs.link(__filename, pathModule.resolve(__dirname, 'fakeFs', 'theTestSuite.js')));
                 }, 'to throw', 'mountFs: Cannot fs.link between mounted file systems');
             });
 
             it('refuses to fs.link into the mounted fs', function () {
                 expect(function () {
-                    expect(mountFs.link(Path.resolve(__dirname, '..', 'LICENSE'), Path.resolve(__dirname, 'fakeFs', 'theLicense')));
+                    expect(mountFs.link(pathModule.resolve(__dirname, '..', 'LICENSE'), pathModule.resolve(__dirname, 'fakeFs', 'theLicense')));
                 }, 'to throw', 'mountFs: Cannot fs.link between mounted file systems');
             });
 
             it('allows linking within the mounted fs', function () {
                 mountedFs.linkSync = sinon.spy().named('linkSync');
-                mountFs.linkSync(Path.resolve(__dirname, 'fakeFs', 'source.txt'), Path.resolve(__dirname, 'fakeFs', 'target.txt'));
+                mountFs.linkSync(pathModule.resolve(__dirname, 'fakeFs', 'source.txt'), pathModule.resolve(__dirname, 'fakeFs', 'target.txt'));
                 expect(mountedFs.linkSync, 'was called with', '/source.txt', '/target.txt');
             });
         });
@@ -120,19 +120,19 @@ describe('MountFs', function () {
         describe('#rename', function () {
             it('refuses to fs.rename out of the mounted fs', function () {
                 expect(function () {
-                    expect(mountFs.rename(__filename, Path.resolve(__dirname, 'fakeFs', 'theTestSuite.js')));
+                    expect(mountFs.rename(__filename, pathModule.resolve(__dirname, 'fakeFs', 'theTestSuite.js')));
                 }, 'to throw', 'mountFs: Cannot fs.rename between mounted file systems');
             });
 
             it('refuses to fs.rename into the mounted fs', function () {
                 expect(function () {
-                    expect(mountFs.rename(Path.resolve(__dirname, '..', 'LICENSE'), Path.resolve(__dirname, 'fakeFs', 'theLicense')));
+                    expect(mountFs.rename(pathModule.resolve(__dirname, '..', 'LICENSE'), pathModule.resolve(__dirname, 'fakeFs', 'theLicense')));
                 }, 'to throw', 'mountFs: Cannot fs.rename between mounted file systems');
             });
 
             it('allows renameing within the mounted fs', function () {
                 mountedFs.renameSync = sinon.spy().named('renameSync');
-                mountFs.renameSync(Path.resolve(__dirname, 'fakeFs', 'source.txt'), Path.resolve(__dirname, 'fakeFs', 'target.txt'));
+                mountFs.renameSync(pathModule.resolve(__dirname, 'fakeFs', 'source.txt'), pathModule.resolve(__dirname, 'fakeFs', 'target.txt'));
                 expect(mountedFs.renameSync, 'was called with', '/source.txt', '/target.txt');
             });
         });
@@ -155,20 +155,20 @@ describe('MountFs', function () {
                 })
             };
 
-            fs.mount(Path.resolve(__dirname, 'fakeFs'), mountedFs);
+            fs.mount(pathModule.resolve(__dirname, 'fakeFs'), mountedFs);
         });
         after(function () {
-            fs.unmount(Path.resolve(__dirname, 'fakeFs'));
+            fs.unmount(pathModule.resolve(__dirname, 'fakeFs'));
             fs.unpatch();
         });
 
         it('should be able to read a file from the root of the mounted fs', function () {
-            var file = Path.resolve(__dirname, 'fakeFs', 'foo.txt');
+            var file = pathModule.resolve(__dirname, 'fakeFs', 'foo.txt');
             return expect(fs.readFileSync(file), 'to equal', 'foofoofoo');
         });
 
         it('should be able to read a file from the mounted fs', function () {
-            var file = Path.resolve(__dirname, 'fakeFs', 'foo/bar/baz.txt');
+            var file = pathModule.resolve(__dirname, 'fakeFs', 'foo/bar/baz.txt');
             return expect(fs.readFileSync(file), 'to equal', 'foobarbaz');
         });
     });
@@ -222,7 +222,7 @@ describe('MountFs', function () {
                 })
             };
             mountFs = new MountFs();
-            mountFs.mount(Path.resolve(__dirname, 'foo', 'fakeFs'), mountedFs);
+            mountFs.mount(pathModule.resolve(__dirname, 'foo', 'fakeFs'), mountedFs);
         });
 
         describe('#readdir()', function () {
@@ -234,7 +234,7 @@ describe('MountFs', function () {
             });
 
             it('should list "fakeFs" in <testDir>/foo', function (done) {
-                mountFs.readdir(Path.resolve(__dirname, 'foo'), passError(done, function (names) {
+                mountFs.readdir(pathModule.resolve(__dirname, 'foo'), passError(done, function (names) {
                     expect(names, 'to contain', 'fakeFs');
                     done();
                 }));
@@ -247,13 +247,13 @@ describe('MountFs', function () {
             });
 
             it('should list "fakeFs" in <testDir>/foo', function () {
-                expect(mountFs.readdirSync(Path.resolve(__dirname, 'foo')), 'to contain', 'fakeFs');
+                expect(mountFs.readdirSync(pathModule.resolve(__dirname, 'foo')), 'to contain', 'fakeFs');
             });
         });
 
         describe('#stat()', function () {
             it.skip('should report <testDir>/foo as a directory', function (done) {
-                mountFs.stat(Path.resolve(__dirname, 'foo'), passError(done, function (stats) {
+                mountFs.stat(pathModule.resolve(__dirname, 'foo'), passError(done, function (stats) {
                     expect(stats.isDirectory(), 'to equal', true);
                 }));
             });
@@ -261,7 +261,7 @@ describe('MountFs', function () {
 
         describe('#statSync()', function () {
             it.skip('should report <testDir>/foo as a directory', function (done) {
-                expect(mountFs.statSync(Path.resolve(__dirname, 'foo')), 'to equal', true);
+                expect(mountFs.statSync(pathModule.resolve(__dirname, 'foo')), 'to equal', true);
             });
         });
     });
@@ -281,14 +281,14 @@ describe('MountFs', function () {
                 }).named('close')
             };
             mountFs = new MountFs();
-            mountFs.mount(Path.resolve(__dirname, 'fakeFs'), mountedFs);
+            mountFs.mount(pathModule.resolve(__dirname, 'fakeFs'), mountedFs);
         });
 
         describe('#open()', function () {
             it('should call the callback with a file descriptor number', function () {
                 var fd;
                 return expect.promise(function (run) {
-                    mountFs.open(Path.resolve(__dirname, 'fakeFs', 'foo.txt'), 'r', run(function (err, _fd) {
+                    mountFs.open(pathModule.resolve(__dirname, 'fakeFs', 'foo.txt'), 'r', run(function (err, _fd) {
                         fd = _fd;
                         expect(err, 'to be falsy');
                         expect(fd, 'to be greater than', 1000);
@@ -316,12 +316,12 @@ describe('MountFs', function () {
                 closeSync: sinon.stub().named('closeSync')
             };
             mountFs = new MountFs();
-            mountFs.mount(Path.resolve(__dirname, 'fakeFs'), mountedFs);
+            mountFs.mount(pathModule.resolve(__dirname, 'fakeFs'), mountedFs);
         });
 
         describe('#open()', function () {
             it('should call the callback with a file descriptor number', function () {
-                var fd = mountFs.openSync(Path.resolve(__dirname, 'fakeFs', 'foo.txt'), 'r');
+                var fd = mountFs.openSync(pathModule.resolve(__dirname, 'fakeFs', 'foo.txt'), 'r');
                 expect(fd, 'to be greater than', 1000);
                 mountFs.closeSync(fd);
                 expect([mountedFs.openSync, mountedFs.closeSync], 'to have calls satisfying', function () {
