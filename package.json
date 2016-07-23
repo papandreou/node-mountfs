@@ -4,6 +4,8 @@
   "description": "fs-compatible module with the ability to mount other fs-compatible modules at specific locations",
   "main": "lib/MountFs.js",
   "devDependencies": {
+    "eslint": "3.1.1",
+    "eslint-config-onelint": "1.1.0",
     "mocha": "2.2.5",
     "sinon": "1.17.4",
     "unexpected": "10.15.0",
@@ -13,7 +15,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --recursive"
+    "test": "mocha --recursive",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
