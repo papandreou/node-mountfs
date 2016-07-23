@@ -5,7 +5,7 @@
   "main": "lib/MountFs.js",
   "devDependencies": {
     "coveralls": "2.11.11",
-    "eslint": "3.1.1",
+    "eslint": "2.13.1",
     "eslint-config-onelint": "1.1.0",
     "mocha": "2.2.5",
     "nyc": "7.0.0",
