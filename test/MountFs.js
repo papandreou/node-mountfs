@@ -145,14 +145,13 @@ describe('MountFs', function () {
             var mountedFs = {
                 readFileSync: sinon.spy(function (path) {
                     switch (path) {
-                        case '/foo.txt':
-                            return 'foofoofoo';
-                        case '/foo/bar/baz.txt':
-                            return 'foobarbaz';
-                        default:
-                            throw new Error("Error: ENOENT, no such file or directory '" + path + "'");
+                    case '/foo.txt':
+                        return 'foofoofoo';
+                    case '/foo/bar/baz.txt':
+                        return 'foobarbaz';
+                    default:
+                        throw new Error("Error: ENOENT, no such file or directory '" + path + "'");
                     }
-                    return "foobar";
                 })
             };
 
@@ -180,15 +179,13 @@ describe('MountFs', function () {
             var mountedFs = {
                 readFileSync: sinon.spy(function (path) {
                     switch (path) {
-                        case '/foo.txt':
-                            return 'foofoofoo';
-                        case '/foo/bar/baz.txt':
-                            return 'foobarbaz';
-                        default:
-                            throw new Error("Error: ENOENT, no such file or directory '" + path + "'");
+                    case '/foo.txt':
+                        return 'foofoofoo';
+                    case '/foo/bar/baz.txt':
+                        return 'foobarbaz';
+                    default:
+                        throw new Error("Error: ENOENT, no such file or directory '" + path + "'");
                     }
-                    console.log('readFileSync', path);
-                    return "foobar";
                 })
             };
 
@@ -328,7 +325,7 @@ describe('MountFs', function () {
                 expect(fd, 'to be greater than', 1000);
                 mountFs.closeSync(fd);
                 expect([mountedFs.openSync, mountedFs.closeSync], 'to have calls satisfying', function () {
-                    mountedFs.openSync('/foo.txt', 'r')
+                    mountedFs.openSync('/foo.txt', 'r');
                     mountedFs.closeSync(42);
                 });
             });
