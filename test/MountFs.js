@@ -329,6 +329,22 @@ describe('MountFs', function () {
                     mountedFs.closeSync(42);
                 });
             });
+
+            it('should open and close a file on the root file system', function () {
+                sinon.spy(fs, 'openSync');
+                sinon.spy(fs, 'closeSync');
+                var packageJsonPath = pathModule.resolve(__dirname, '..', 'package.json');
+                var fd = mountFs.openSync(packageJsonPath, 'r');
+                mountFs.closeSync(fd);
+                expect([fs.openSync, fs.closeSync], 'to have calls satisfying', function () {
+                    fs.openSync(packageJsonPath, 'r');
+                    fs.closeSync(expect.it('to be a number'));
+                }).finally(function () {
+                    fs.openSync.restore();
+                    fs.closeSync.restore();
+                });
+            });
         });
     });
+
 });
