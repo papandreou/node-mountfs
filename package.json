@@ -1,6 +1,6 @@
 {
   "name": "mountfs",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "fs-compatible module with the ability to mount other fs-compatible modules at specific locations",
   "main": "lib/MountFs.js",
   "devDependencies": {
