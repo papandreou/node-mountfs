@@ -32,8 +32,14 @@
     "url": "git://github.com/papandreou/node-mountfs.git"
   },
   "keywords": [
+    "file system",
+    "filesystem",
     "fs",
-    "git"
+    "mount point",
+    "mount points",
+    "mount",
+    "mountpoint",
+    "mountpoints"
   ],
   "author": "Andreas Lind <andreas@one.com>",
   "license": "BSD",
